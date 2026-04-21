@@ -10,41 +10,47 @@ for tc in range(1, T + 1):
     board = [[0] * SIZE for _ in range(SIZE)]
     q = []
 
-    # 초기 세포 삽입
+    # 초기 세포 입력
     for i in range(N):
         for j in range(M):
             if arr[i][j] != 0:
                 y = i + OFFSET
                 x = j + OFFSET
                 life = arr[i][j]
+
                 # (y, x, 생명력, 남은시간, 상태)
-                # 상태: 0=비활성, 1=활성
+                # 상태: 0 비활성, 1 활성
                 q.append((y, x, life, life, 0))
                 board[y][x] = life
 
     dy = [-1, 1, 0, 0]
     dx = [0, 0, -1, 1]
 
+    # K시간 동안 반복
     for _ in range(K):
-        new = {}
+        new = {}  # 이번 시간 번식 결과
 
-        # 이번 시간에 처리할 범위
         size = len(q)
 
         for i in range(size):
-            y, x, life, timer, state = q[i]
+            cell = q[i]
+            if cell is None:
+                continue
 
-            # 비활성
+            y, x, life, timer, state = cell
+
+            # 비활성 상태
             if state == 0:
                 if timer == 1:
-                    # 활성화
+                    # 활성 상태로 전환
                     q[i] = (y, x, life, life, 1)
                 else:
+                    # 비활성 시간 감소
                     q[i] = (y, x, life, timer - 1, 0)
 
-            # 활성
+            # 활성 상태
             else:
-                # 활성 첫 순간  번식
+                # 활성 시작 시 번식
                 if timer == life:
                     for d in range(4):
                         ny = y + dy[d]
@@ -59,8 +65,8 @@ for tc in range(1, T + 1):
                         else:
                             new[(ny, nx)] = life
 
+                # 활성 종료 시 죽음
                 if timer == 1:
-                    # 죽음  제거 표시
                     q[i] = None
                 else:
                     q[i] = (y, x, life, timer - 1, 1)
@@ -73,4 +79,4 @@ for tc in range(1, T + 1):
         # 죽은 세포 제거
         q = [cell for cell in q if cell is not None]
 
-    print("#{} {}".format(tc, len(q)))
+    print(f"#{tc} {len(q)}")
